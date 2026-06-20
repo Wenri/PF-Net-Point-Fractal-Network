@@ -1,50 +1,59 @@
 # PF-Net-Point-Fractal-Network
 
-This repository is still under constructions.
+PyTorch implementation of **PF-Net: Point Fractal Network for 3D Point Cloud Completion** (CVPR 2020).
 
-If you have any questions about the code, please email me. Thanks!
+Paper: <https://openaccess.thecvf.com/content_CVPR_2020/papers/Huang_PF-Net_Point_Fractal_Network_for_3D_Point_Cloud_Completion_CVPR_2020_paper.pdf>
 
-This is the Pytorch implement of CVPR2020 PF-Net: Point Fractal Network for 3D Point Cloud Completion. 
+> Fork of [zztianzz/PF-Net-Point-Fractal-Network](https://github.com/zztianzz/PF-Net-Point-Fractal-Network) with the dataset re-hosted as a GitHub release (the original Stanford download is offline) and documentation fixes.
 
-https://openaccess.thecvf.com/content_CVPR_2020/papers/Huang_PF-Net_Point_Fractal_Network_for_3D_Point_Cloud_Completion_CVPR_2020_paper.pdf
+## 0) Environment
+- Python 3.7.4
+- PyTorch 1.0.1
 
-##0) Environment
-Pytorch 1.0.1
-Python 3.7.4
+## 1) Dataset
 
-##1) Dataset
-```
-  cd dataset
-  bash download_shapenet_part16_catagories.sh
-  You can also download the dataset from 
-  链接：https://pan.baidu.com/s/1MavAO_GHa0a6BZh4Oaogug 提取码：3hoe 
-```
-##2) Train
-```
-python Train_FPNet.py 
-```
-Change ‘crop_point_num’ to control the number of missing points.
-Change ‘point_scales_list ’to control different input resolutions.
-Change ‘D_choose’to control without using D-net.
+PF-Net is trained on the original ShapeNet part-segmentation benchmark
+(`shapenetcore_partanno_segmentation_benchmark_v0`, the `.pts` / `.seg` layout).
+The original Stanford link is no longer reachable, so the dataset is mirrored as a
+release asset of this repository:
 
-##3) Evaluate the Performance on ShapeNet
+```bash
+cd dataset
+wget https://github.com/Wenri/PF-Net-Point-Fractal-Network/releases/download/dataset-v0/shapenetcore_partanno_segmentation_benchmark_v0.zip
+mkdir -p shapenet_part
+unzip shapenetcore_partanno_segmentation_benchmark_v0.zip -d shapenet_part/
 ```
-python show_recon.py
-```
-Show the completion results, the program will generate txt files in 'test-examples'.
-```
-python show_CD.py
-```
-Show the Chamfer Distances and two metrics in our paper.
 
-##4) Visualization of csv File
+This produces `dataset/shapenet_part/shapenetcore_partanno_segmentation_benchmark_v0/`,
+the default path expected by `shapenet_part_loader.py`.
 
-We provide some incomplete point cloud in file 'test_one'. Use the following code to complete a incomplete point cloud of csv file:
+> **Note:** the train/eval scripts currently pass an explicit
+> `root='./dataset/shapenetcore_partanno_segmentation_benchmark_v0/'`. Point that
+> argument at the extracted folder above (or rely on the `PartDataset` default) before running.
+
+(The legacy `dataset/download_shapenet_part16_catagories.sh` is kept for reference; an
+older Baidu mirror was: 链接 https://pan.baidu.com/s/1MavAO_GHa0a6BZh4Oaogug 提取码 3hoe.)
+
+## 2) Train
+```bash
+python Train_PFNet.py
 ```
+- `--crop_point_num` controls the number of missing points (must be a multiple of 128).
+- `--point_scales_list` controls the input resolutions.
+- `--D_choose 1` trains with the discriminator (D-Net); `--D_choose 0` trains the generator only.
+
+## 3) Evaluate on ShapeNet
+```bash
+python show_recon.py   # writes completion results as .txt (view in Meshlab)
+python show_CD.py      # reports the Chamfer Distance and the two metrics from the paper
+```
+
+## 4) Complete a single CSV point cloud
+Incomplete examples live in `test_one/`:
+```bash
 python Test_csv.py
 ```
-change ‘infile’and  ‘infile_real’to select different incomplete point cloud in ‘test_one’
+Change `infile` / `infile_real` in the script to select a different example.
 
-##5) Visualization of Examples
-
-Using Meshlab to visualize  the txt files.
+## 5) Visualization
+Open the generated `.txt` files with [Meshlab](https://www.meshlab.net/).

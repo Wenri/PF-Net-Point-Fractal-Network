@@ -1,0 +1,11 @@
+# Dataset — large (~797 MB); published as a GitHub release asset instead of committed
+/dataset/shapenet_part/
+*.zip
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+
+# Training outputs / checkpoints
+/Trained_Model/
+*.pth
